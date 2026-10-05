@@ -1,0 +1,104 @@
+數值方法 10/07 小考｜Excel / VBA 實作
+
+1. 先開「01_完整示範.xlsm」。依 E1、E2、E3、E4 順序學習。
+2. 黃底為可改輸入。點公式格看公式列，按 Alt+F11 看 Module1。
+3. E1：按 Alt+F8，執行 NM_RunE1Logs；在 E1_迭代 向右比較四方法與壞初值。
+4. 再開「02_骨架練習.xlsm」自行完成公式和 TODO。骨架函數回傳 #N/A 表示尚未作答。
+5. 最後使用 03_實作模擬考 的題本及 A_B_模擬考起始檔.xlsm；起始檔無解答。
+
+VBA 函數表
+NM_Root(method, fn, a, b, tol, maxIter, [data], [h])
+  method："Bisection"、"FalsePosition"、"Newton"、"Secant"。
+  fn：1 = ln(x-1)+cos(x-1)，2 = cos(x)-x，3 = 插值 P，4 = P 的中央一階差分，5 = 中央二階差分。
+  Newton 使用 a 作 x0，b 填 0；其他方法用 a、b 作兩端點或兩初值。
+  fn=3/4/5 必須提供兩欄 x,y 資料 Range。h 預設 0.001。
+NM_Lagrange(data,x) / NM_NewtonPoly(data,x)
+NM_NewtonCoeff(data,k)：k 從 0 開始。
+NM_D1(data,x,h) / NM_D2(data,x,h)
+NM_ExpTaylor(x,degree) / NM_SinTaylor(x,degree)
+NM_AddUp(x,n)
+
+停止與誤差
+求根一般要求更新量和殘差均達 tol；二分更新量使用半區間寬，恰為零可立即停止。
+定義域不符、分母或導數接近零、未在最大迭代數內達標，都明確回傳錯誤。
+h 是微分步長；tol 是求根停止門檻。把 tol 改小不會消除固定 h 的截斷誤差。
+NM_Root 對 fn=3/4 的 Newton 導數使用差分，是近似 Newton；不要稱為解析導數。
+E1 故意使用 x0=5 演示失敗，程式在新候選 x<=1 時先停止，不呼叫 Log。
+E3 的區間全域最大值必須把全部駐點和兩端點一起比較。
+
+來源與檔案
+本次教材以當期 0909、0916、0923、0930 實作和歷屆五點插值資料改編；E4 為自編。
+NM_Core.bas 是示範檔的完整原碼；NM_Practice.bas 是骨架原碼。
+活頁簿已內嵌 VBA，不需另行匯入。BAS 供閱讀、備份、練習。
+BAS 使用繁體中文 Windows VBA 相容的 CP950 編碼；它與活頁簿內的原碼一致。
+若將 BAS 匯入另一個空白 XLSM，請勿重複匯入同名 Module1。
+使用支援 VBA 的桌面 Excel。依 Excel 對本機可信檔案的提示開啟內容，不需更改信任中心設定。
+
+原始課程檔案未修改；本套材料也沒有執行原始課程巨集。
+
+中文讀碼導覽（依 Module1 函數名稱搜尋，從上往下閱讀）
+
+NM_E1
+  輸入 x，先判斷 x<=1，再計算 Log(x-1)+Cos(x-1)。
+  VBA 的 Log 是自然對數。順序不能顛倒，否則先產生定義域錯誤。
+
+NM_Lagrange
+  data 是兩欄資料，例如 A5:B9；第一欄 x_i，第二欄 y_i。
+  a=data.Value2 把 Range 讀成 1 起算的二維陣列。
+  外層 i 選一個基底；m=1 初始化乘積；內層 j 跳過 i。
+  m *= (x-x_j)/(x_i-x_j)，最後 total += m*y_i。
+  相同 x_i 會造成分母零，必須拒絕；最後把 total 指派給函數名就是回傳。
+
+NM_NewtonCoeff
+  k=0 回傳第一個 y；k=1 回傳一階差商；依此類推。
+  c 起初裝 y；每升一階 j，i 必須由 n 倒數到 j+1，避免覆蓋還要用的舊值。
+  更新 c(i)=(c(i)-c(i-1))/(x_i-x_(i-j))，回傳 c(k+1)。
+
+NM_NewtonPoly
+  從 k=0 累加係數乘連乘積；prod 起初為 1。
+  每一輪加入 c_k*prod，再把 prod 乘上 (x-x_k)，供下一項使用。
+  與 Lagrange 相同資料應得到相同插值多項式，只是表示方式不同。
+
+NM_D1 / NM_D2
+  分別把插值函數當成可計算的 P(x)，套中央一階／二階差分公式。
+  h 必須大於 0。兩函數輸出的單位與大小不同，別把一階零點當反曲點。
+
+NM_ExpTaylor / NM_SinTaylor
+  不直接算巨大階乘，而由前一項遞推下一項，避免重複計算。
+  exp：term *= x/k；sin：term *= -x²/[k(k-1)]，k 每次加 2。
+  degree 是允許的最高次方，sin 的偶次係數為 0。
+
+NM_AddUp
+  total 用 Double 儲存，For 迴圈把 x 加 n 次。
+  比較直接 x*n 就可看出計算路徑不同造成的浮點捨入。
+
+NM_Eval / NM_Derivative（Private）
+  它們是內部派送器，按 fn 選要算的函數和導數。
+  fn=1、2 使用解析一階導數；插值相關使用差分。
+  fn=3 的 Newton 預設用中央 D1，所以迭代數可能和解答中解析導數版不同。
+  若題目指定解析導數，修改 NM_Derivative 的 Case 3；E3 可用 -2*x^3+5*x+3。
+  fn=4 使用 D2 近似 D1 的導數；固定 h 時兩者未必完全相同，屬近似 Newton。
+  若反求 P(x)=c，應解 P(x)-c=0；修改 NM_Eval 的 Case 3 減去指定 c。
+  Private 代表不作為工作表公開函數介面，讓重用邏輯集中一處。
+
+NM_Root / NM_Solve
+  NM_Root 是短介面；NM_Solve 才是完整迭代程式，初學先追一種方法即可。
+  二分：c=a+(b-a)/2；依 f(a) 和 f(c) 符號更新區間。
+  假位：c=a-f(a)*(b-a)/(f(b)-f(a))；仍保留包夾。
+  Newton：c=a-f(a)/f'(a)；a 更新為 c。
+  Secant：c=b-f(b)*(b-a)/(f(b)-f(a))；舊 b 成為新 a。
+  先檢查輸入、分母／導數，再算新點，再檢查定義域，最後計算殘差。
+  每輪記錄 k、兩個舊值、新值、殘差、更新量，判斷是否同時達 tol。
+  達到 maxIter 不代表成功，會回傳錯誤；CVErr 用 Excel 錯誤值表達失敗。
+  If、For、Select Case 分別處理條件、重複及四種方法的分支。
+
+NM_RunE1Logs（Sub）
+  Function 回傳一個值，可放公式格；Sub 負責操作工作表、清除舊紀錄及批次執行。
+  ThisWorkbook 指這份教材；Worksheets 指定輸出表，避免寫到別的活頁簿。
+  此 Sub 只改 E1_迭代 的紀錄區，從 E1_求根 黃底格讀取參數。
+
+骨架練習的預期流程
+  先補 NM_TryLagrange，確認輸入節點時能回傳原 y。
+  再補 NM_TryD1，用自編三次式對照解析導數。
+  最後補 NM_TryNewton，用成功初值與壞初值各測一次，寫出停止原因。
+
