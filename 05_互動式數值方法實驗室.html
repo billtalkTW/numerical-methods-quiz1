@@ -12,6 +12,7 @@
 @media(max-width:740px){.shell{padding:0 16px}.topbar{height:66px}.brand{font-size:14px}.tag{font-size:10px}.hero{padding:30px 0 25px}.hero p{font-size:14px}.nav{grid-template-columns:1fr 1fr;gap:7px;margin-bottom:24px}.nav button{padding:11px 13px}.nav .num{font-size:19px}.nav strong{font-size:13px}.workspace{display:block}.controls{margin-bottom:16px;grid-template-columns:1fr 1fr;gap:15px}.controls>.control-title,.controls>.formula,.controls>.wide,.controls>.presets,.controls>.control-desc,.controls>.node-table,.controls>.checks{grid-column:1/-1}.controls>.two{grid-column:1/-1}.board{padding:16px 12px}.section-head h2{font-size:22px}.section-head{display:block}.lesson-ref{text-align:left;padding-top:8px}.section-head p{font-size:13px}.board-head{flex-wrap:wrap;gap:8px}.board-head h3{font-size:15px}.legend{font-size:11px;gap:10px}.metrics{gap:8px}.metric b{font-size:14px}.metric small{font-size:11px}.metric em{font-size:10px}.learning{grid-template-columns:1fr;gap:16px}.learning article{padding:20px}.footer{display:block}.footer a{display:inline-block;margin-top:12px}.composite{padding:15px}.composite .metrics{grid-template-columns:1fr}.composite .metric{display:grid;grid-template-columns:1fr 1fr;gap:5px}.composite .metric em{grid-column:1/-1}.stepbar button{padding:8px 10px;font-size:12px}.stepcount{font-size:12px;min-width:60px}input[type=number],select{font-size:16px}.node-table input{font-size:16px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 @media print{.nav,.controls,.stepbar,.quiz-options,.footer a{display:none}.shell{max-width:none;padding:0}.hero{padding:20px 0}.workspace,.learning{display:block}.learning article{margin-top:15px;break-inside:avoid}.board{box-shadow:none}.plot{break-inside:avoid}.footer{margin-top:20px}[role=tabpanel][hidden]{display:none!important}}
+@media(max-width:600px){#r-coordinates{grid-template-columns:1fr;gap:12px}#r-coordinates .metric{border-bottom:1px solid var(--line);padding-bottom:8px}}
 </style>
 </head>
 <body>
@@ -37,7 +38,7 @@
 <div class="formula" id="r-formula"></div><div class="presets"><button type="button" class="small" id="r-good">這個方法的預設值</button><button type="button" class="small" id="r-bad">E1 壞初值：x₀ = 5</button></div>
 <p class="control-desc">二分／假位法須使用連續函數的異號區間。E1 定義域為 x &gt; 1；Newton 與割線法沒有保留區間的保證。</p>
 </aside><div class="board"><div class="board-head"><h3>每一步如何產生下一點</h3><div class="legend"><span><i class="swatch"></i>原函數</span><span><i class="swatch orange dash"></i>本步幾何</span></div></div>
-<div class="plot" id="root-plot"></div><p class="tiny">深色水平線是 y = 0（求根目標）。曲線上的實心橘點是 (c, f(c))；零線上的空心橘點只是候選 c 的投影，並不代表已找到根。下方彩色刻度標示本步位置；點靠近時標籤分行排列。</p><div id="r-input-note" class="status" aria-live="polite"></div>
+<div class="plot" id="root-plot"></div><p class="tiny">深色水平線是 y = 0（求根目標）。曲線上的實心橘點是 (c, f(c))；零線上的空心橘點只是候選 c 的投影，並不代表已找到根。下方彩色刻度標示本步位置；點靠近時標籤分行排列。</p><div id="r-coordinates" class="metrics" aria-live="polite"></div><div id="r-input-note" class="status" aria-live="polite"></div>
 <div class="stepbar"><button type="button" id="r-prev" aria-label="上一步">←</button><button type="button" id="r-play" class="primary">播放</button><button type="button" id="r-next" aria-label="下一步">→</button><input id="r-step" type="range" min="1" max="1" value="1" aria-label="迭代步驟"><span id="r-step-label" class="stepcount"></span><button type="button" id="r-last">到最後一步</button></div>
 <div class="metrics" aria-live="polite"><div class="metric"><small>本步候選 x</small><b id="r-x">—</b></div><div class="metric"><small>殘差 |f(x)|</small><b id="r-res">—</b></div><div class="metric"><small id="r-delta-label">區間半寬</small><b id="r-delta">—</b></div></div>
 <div id="r-status" class="status" role="status"></div>
@@ -48,7 +49,7 @@
 <section id="taylor" role="tabpanel" aria-labelledby="tab-taylor" hidden>
 <div class="section-head"><div><h2>多留幾項，能準多少？</h2><p>固定展開中心 x₀ = 0，觀察最高次數與計算位置如何影響近似。</p></div><div class="lesson-ref">對照：E2 · 模考 B2</div></div>
 <div class="workspace"><aside class="controls"><div class="control-title">調整展開與位置</div><label class="wide">函數<select id="t-function"><option value="exp">exp(x)</option><option value="sin">sin(x)（弧度）</option></select></label>
-<label class="wide"><span class="range-title"><span>最高次數 degree</span><output id="t-n-label">4</output></span><input id="t-n" type="range" min="0" max="20" step="1" value="4"></label>
+<label class="wide">展開中心 a（−3 ～ 3）<input id="t-center" type="number" min="-3" max="3" step="any" value="0"></label><p class="control-desc">a 是展開中心，x 是要估算的位置。a = 0 時為 Maclaurin 展開；本實驗顯示範圍為 −3 ～ 3。</p><label class="wide"><span class="range-title"><span>最高次數 degree</span><output id="t-n-label">4</output></span><input id="t-n" type="range" min="0" max="20" step="1" value="4"></label>
 <label class="wide"><span class="range-title"><span>計算位置 x</span><output id="t-x-label">0.50</output></span><input id="t-x" type="range" min="-3" max="3" step="0.01" value="0.5"></label>
 <div id="t-formula" class="formula"></div><div class="presets"><button type="button" class="small" id="t-near">講義範例：exp(0.5)</button><button type="button" class="small" id="t-far">遠一點：x = 3</button></div>
 <p class="control-desc">degree 是最高次數，包含常數項。exp 的 degree = 4 有五項；sin 的偶次係數為 0，degree = 4 仍是 x − x³/3!。</p></aside>
@@ -216,17 +217,13 @@ VBA 二階：(P(x + h) - 2 * P(x) + P(x - h)) / (h * h)
     return done('max_iterations', '已達迭代上限；尚未同時符合停止條件。');
   }
 
-  function taylor(kind, x, degree) {
+  function taylor(kind, x, degree, center = 0) {
     if (!['exp', 'sin'].includes(kind)) throw new RangeError('Taylor 種類須為 exp 或 sin。');
-    if (!finite(x) || !Number.isInteger(degree) || degree < 0 || degree > 170)
-      throw new RangeError('x 須為有限實數，degree 須為 0 至 170 的整數。');
-    let term = kind === 'exp' ? 1 : x, sum = term;
-    if (kind === 'sin' && degree === 0) return 0;
-    if (kind === 'exp') {
-      for (let k = 1; k <= degree; k++) { term = term * x / k; sum += term; }
-    } else {
-      for (let k = 3; k <= degree; k += 2) { term = -term * x * x / (k * (k - 1)); sum += term; }
-    }
+    if (!finite(x) || !finite(center) || !Number.isInteger(degree) || degree < 0 || degree > 170)
+      throw new RangeError('x、展開中心須為有限實數；degree 須為 0 至 170 的整數。');
+    const dx=x-center, derivatives=kind==='sin'?[Math.sin(center),Math.cos(center),-Math.sin(center),-Math.cos(center)]:null;
+    let power=1,sum=0;
+    for(let k=0;k<=degree;k++){if(k>0)power*=dx/k;sum+=(kind==='exp'?Math.exp(center):derivatives[k%4])*power;}
     if (!finite(sum)) throw new RangeError('Taylor 中間計算超出有限數值範圍。');
     return sum;
   }
@@ -386,6 +383,8 @@ function renderRoot(){if(!rootResult){computeRoot();return;}const result=rootRes
   }else if(Number.isFinite(result.root))points.push({x:result.root,y:0,label:'初始值已是根',color:C.orange});
   const current=row||{a:result.initial.a,b:result.initial.b};
   const axisMarks=[{x:current.a,label:method==='newton'?'目前 xₖ':method==='secant'?'前一點 xₖ₋₁':'本步 a'},...(method==='newton'?[]:[{x:current.b,label:method==='secant'?'目前 xₖ':'本步 b'}]),...(row?[{x:row.x,label:'候選 c',color:C.orange}]:[])];
+  const coords=[{label:method==='newton'?'目前點 xₖ':method==='secant'?'前一點 xₖ₋₁':'a 點',x:current.a,y:row?row.fa:result.initial.fa},...(method==='newton'?[]:[{label:method==='secant'?'目前點 xₖ':'b 點',x:current.b,y:row?row.fb:result.initial.fb}]),...(row?[{label:'候選 c 點',x:row.x,y:row.fx}]:[])];
+  $('r-coordinates').innerHTML=coords.map(p=>`<div class="metric"><small>${p.label}</small><b>x = ${fmt(p.x,12)}</b><em style="font-size:13px;color:var(--ink);overflow-wrap:anywhere">y = f(x) = ${Number.isFinite(p.y)?fmt(p.y,12):'未計算（請見原因）'}</em></div>`).join('');
   const init=result.initial;
   status('r-input-note',`初始設定：${method==='newton'?'x₀':'a / x₀'} = ${fmt(init.a,12)}${method==='newton'?'':`，b / x₁ = ${fmt(init.b,12)}`}。${method==='newton'?'Newton 只使用一個初值，不要求異號，但導數不能接近 0，且每次更新都要留在定義域。':method==='secant'?'割線法使用兩個不同初值，不要求異號，也不保證候選點留在兩點之間。':`f(a) = ${fmt(init.fa,12)}，f(b) = ${fmt(init.fb,12)}。二分法／假位法要求 a < b、區間內連續及端點異號（端點已是根除外）。`}${key==='e1'?' 此函數含 ln(x−1)，整個合法區間必須位於 x > 1。':''}${!rows.length&&result.status!=='converged'?' 設定問題：'+result.message:''}`,!rows.length&&result.status!=='converged'?'error':'');
   plot('root-plot',{axisMarks,zeroLabel:'y = 0（求根目標）',x:dx,y:dy,series:[{data}],areas,segments,points,height:300,xlabel:'x',ylabel:'f(x)',description:`${fn.label}；${method}第${row?.k||0}次更新。陰影表示本步舊區間，橘色表示候選點或切線。`});
@@ -407,18 +406,30 @@ $('r-step').addEventListener('input',()=>moveRoot(n('r-step')));$('r-prev').addE
 $('r-play').addEventListener('click',()=>{if(playing){stopPlay();return;}if(rootStep>=rootResult.rows.length)rootStep=1;$('r-play').textContent='暫停';$('r-play').setAttribute('aria-pressed','true');renderRoot();playing=setInterval(()=>{rootStep++;renderRoot();if(rootStep>=rootResult.rows.length)stopPlay();},900);});
 $('r-export').addEventListener('click',()=>{const lines=[['method',rootResult.method],['function',NM.functions[$('r-function').value].label],['status',rootResult.status],['tol',n('r-tol')],['k','a','b','candidate_x','f_x','delta','invalid'],...rootResult.rows.map(r=>[r.k,r.a,r.b,r.x,r.fx,r.delta,!!r.invalid])];const csv='\ufeff'+lines.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='求根迭代_'+$('r-method').value+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 
-function renderTaylor(){const kind=$('t-function').value,degree=n('t-n'),x=n('t-x'),f=kind==='exp'?Math.exp:Math.sin,truth=f(x),approx=NM.taylor(kind,x,degree),error=Math.abs(approx-truth);
-  $('t-n-label').textContent=degree;$('t-x-label').textContent=x.toFixed(2);$('t-formula').innerHTML=kind==='exp'?'Tₙ(x) = Σ<sub>k=0…n</sub> xᵏ / k!':'Tₙ(x) = x − x³/3!<br>+ x⁵/5! − …（次數 ≤ n）';
-  const actual=sample(f,-3,3),poly=sample(v=>NM.taylor(kind,v,degree),-3,3),dy=extent([...actual,...poly].map(p=>p.y),true,.09);
-  plot('taylor-plot',{x:[-3,3],y:dy,series:[{data:actual},{data:poly,color:C.orange,dash:true}],cursorX:x,points:[{x,y:truth,color:C.teal},{x,y:approx,color:C.orange,hollow:true,r:6}],axisMarks:[{x:0,label:'展開中心'},{x,label:'計算 x',color:C.orange}],xlabel:'x（展開中心 = 0）',ylabel:kind==='exp'?'exp(x) / Tₙ(x)':'sin(x) / Tₙ(x)',description:'實線是原函數、虛線是Taylor多項式，標記目前計算位置。'});
-  updateMetrics(['t-true','t-approx','t-error'],[truth,approx,error]);const signed=approx-truth;
-  status('t-status',`目前 degree = ${degree}，Tₙ − f = ${fmt(signed)}。${signed>0?'近似值偏大。':signed<0?'近似值偏小。':'目前雙精度計算差為 0。'}${kind==='sin'?' sin 的偶次係數為 0，因此從奇次增加到下一個偶次，結果不變。':' 展開中心固定為 0；試著只移動 x，保留相同次數。'}`);
-  const errors=Array.from({length:21},(_,k)=>({x:k,y:logError(NM.taylor(kind,x,k)-truth)}));plot('taylor-error-plot',{x:[0,20],y:[-17,Math.max(1,...errors.map(p=>p.y))],series:[{data:errors}],points:[{...errors[degree],color:C.orange,r:5}],cursorX:degree,integerX:true,axisMarks:[{x:degree,label:'目前次數',color:C.orange}],height:210,xlabel:'最高次數 degree',ylabel:'log₁₀ 絕對差',description:'固定x時，Taylor最高次數與計算誤差的關係。橘點是目前次數。'});
-  let expTerm=1,sinTerm=x;$('t-terms').innerHTML=Array.from({length:degree+1},(_,k)=>{let term=0;if(kind==='exp'){if(k>0)expTerm*=x/k;term=expTerm;}else if(k===1){term=sinTerm;}else if(k>=3&&k%2===1){sinTerm=-sinTerm*x*x/((k-1)*k);term=sinTerm;}const sum=NM.taylor(kind,x,k);return`<tr><td>${k}</td><td>${fmt(term)}</td><td>${fmt(sum)}</td><td>${fmt(Math.abs(sum-truth))}</td></tr>`;}).join('');
-  $('t-code-note').textContent=(kind==='exp'?'由前一項乘 x/k 產生下一項，避免反覆計算階乘。':'sin 只累加奇次項；degree 表示最高允許次數，不是非零項個數。')+' 新增項獨立遞推；部分和只顯示有限位數，畫面不變不代表新增項是 0。';
-  $('t-code').textContent=kind==='exp'?'term = 1: total = 1\nFor k = 1 To degree\n    term = term * x / k\n    total = total + term\nNext k':'If degree < 1 Then\n    total = 0\nElse\n    term = x: total = x\n    For k = 3 To degree Step 2\n        term = -term * x * x / ((k - 1) * k)\n        total = total + term\n    Next k\nEnd If';
+function renderTaylor(){
+  const kind=$('t-function').value,degree=n('t-n'),x=n('t-x'),center=Number.parseFloat($('t-center').value);
+  $('t-n-label').textContent=degree;$('t-x-label').textContent=x.toFixed(2);
+  if(!Number.isFinite(center)||Math.abs(center)>3){
+    status('t-status','展開中心 a 請輸入 −3 ～ 3 的有限實數；空白時不進行計算。','error');
+    updateMetrics(['t-true','t-approx','t-error'],[null,null,null]);
+    ['taylor-plot','taylor-error-plot','t-terms','t-formula','t-code','t-code-note'].forEach(id=>$(id).textContent='');return;
+  }
+  const f=kind==='exp'?Math.exp:Math.sin,truth=f(x),approx=NM.taylor(kind,x,degree,center),error=Math.abs(approx-truth),dx=x-center;
+  $('t-formula').innerHTML='Tₙ(x) = Σ<sub>k=0…n</sub> f⁽ᵏ⁾(a)(x−a)ᵏ / k!<br>a = '+fmt(center,8)+(kind==='exp'?'<br>f⁽ᵏ⁾(a) = exp(a)':'<br>導數循環：sin(a)、cos(a)、−sin(a)、−cos(a)');
+  const actual=sample(f,-3,3),poly=sample(v=>NM.taylor(kind,v,degree,center),-3,3),dy=extent([...actual,...poly].map(p=>p.y),true,.09);
+  plot('taylor-plot',{x:[-3,3],y:dy,series:[{data:actual},{data:poly,color:C.orange,dash:true}],cursorX:x,points:[{x:center,y:f(center),color:C.purple,label:'中心 a',r:5},{x,y:truth,color:C.teal},{x,y:approx,color:C.orange,hollow:true,r:6}],axisMarks:[{x:center,label:'展開中心 a',color:C.purple},{x,label:'計算 x',color:C.orange}],xlabel:'x',ylabel:kind==='exp'?'exp(x) / Tₙ(x)':'sin(x) / Tₙ(x)',description:'紫點是展開中心；實線是原函數，虛線是目前中心的 Taylor 多項式。'});
+  updateMetrics(['t-true','t-approx','t-error'],[truth,approx,error]);
+  status('t-status',`中心 a = ${fmt(center)}；x − a = ${fmt(dx)}；degree = ${degree}；Tₙ − f = ${fmt(approx-truth)}。${center===0?'目前是 Maclaurin 展開。':'目前是非零中心的 Taylor 展開。'}${kind==='sin'?(center===0?' sin 在 a = 0 時偶次係數為 0。':' sin 在一般非零中心通常同時含奇次與偶次項，不能只保留奇次項。'):''} 固定 x 和次數，再移動 a，觀察誤差如何改變。`);
+  const errors=Array.from({length:21},(_,k)=>({x:k,y:logError(NM.taylor(kind,x,k,center)-truth)}));
+  plot('taylor-error-plot',{x:[0,20],y:[-17,Math.max(1,...errors.map(p=>p.y))],series:[{data:errors}],points:[{...errors[degree],color:C.orange,r:5}],cursorX:degree,integerX:true,axisMarks:[{x:degree,label:'目前次數',color:C.orange}],height:210,xlabel:'最高次數 degree',ylabel:'log₁₀ 絕對差',description:'固定中心 a 與 x，觀察次數與誤差。'});
+  let power=1,sum=0;const deriv=[Math.sin(center),Math.cos(center),-Math.sin(center),-Math.cos(center)];
+  $('t-terms').innerHTML=Array.from({length:degree+1},(_,k)=>{if(k>0)power*=dx/k;const term=(kind==='exp'?Math.exp(center):deriv[k%4])*power;sum+=term;return`<tr><td>${k}</td><td>${fmt(term)}</td><td>${fmt(sum)}</td><td>${fmt(Math.abs(sum-truth))}</td></tr>`;}).join('');
+  $('t-code-note').textContent='以下為可調中心的 VBA 寫法：a 是中心、x 是計算位置。power 遞推 (x−a)^k/k!，degree 是最高次數。下載的 Excel／BAS 仍是原本 a = 0 的範例，尚未加入中心參數。';
+  $('t-code').textContent='dx = x - a\npower = 1: total = 0\nFor k = 0 To degree\n    If k > 0 Then power = power * dx / k\n'+(kind==='exp'?'    deriv = Exp(a)\n':'    Select Case k Mod 4\n        Case 0: deriv = Sin(a)\n        Case 1: deriv = Cos(a)\n        Case 2: deriv = -Sin(a)\n        Case 3: deriv = -Cos(a)\n    End Select\n')+'    total = total + deriv * power\nNext k';
 }
-['t-function','t-n','t-x'].forEach(id=>$(id).addEventListener('input',renderTaylor));$('t-near').addEventListener('click',()=>{$('t-function').value='exp';$('t-x').value=.5;$('t-n').value=4;renderTaylor();});$('t-far').addEventListener('click',()=>{$('t-x').value=3;renderTaylor();});
+['t-function','t-n','t-x','t-center'].forEach(id=>$(id).addEventListener('input',renderTaylor));
+$('t-near').addEventListener('click',()=>{$('t-function').value='exp';$('t-center').value=0;$('t-x').value=.5;$('t-n').value=4;renderTaylor();});
+$('t-far').addEventListener('click',()=>{$('t-x').value=3;renderTaylor();});
 
 let nodes=NM.E3.map(p=>({...p})),drag=null,interpView=null;
 function drawNodeInputs(){$('i-nodes').innerHTML=nodes.map((p,i)=>`<tr><td>${i}</td><td><input type="number" step="any" value="${p.x}" data-node="${i}" data-axis="x" aria-label="第${i}個點 x"></td><td><input type="number" step="any" value="${p.y}" data-node="${i}" data-axis="y" aria-label="第${i}個點 y"></td></tr>`).join('');}
